@@ -1,3 +1,4 @@
+/*
 import React, { useReducer, useContext } from 'react'
 
 // Initialize the context
@@ -101,3 +102,104 @@ const CartProvider = ({ children }) => {
 const useCart = () => useContext(CartContext)
 
 export { CartProvider, useCart }
+*/
+
+// src/state/CartProvider.js
+import React, { useReducer } from 'react';
+
+// Define initial state and actions
+const initialState = {
+  itemsById: {},
+  allItems: [],
+};
+
+const ADD_ITEM = 'ADD_ITEM';
+const REMOVE_ITEM = 'REMOVE_ITEM';
+const UPDATE_ITEM_QUANTITY = 'UPDATE_ITEM_QUANTITY';
+
+const cartReducer = (state, action) => {
+  switch (action.type) {
+    case ADD_ITEM:
+      const newItem = action.payload;
+      return {
+        ...state,
+        itemsById: {
+          ...state.itemsById,
+          [newItem._id]: {
+            ...newItem,
+            quantity: state.itemsById[newItem._id]
+              ? state.itemsById[newItem._id].quantity + 1
+              : 1,
+          },
+        },
+        allItems: [...new Set([...state.allItems, newItem._id])],
+      };
+    case REMOVE_ITEM:
+      const updatedItemsById = { ...state.itemsById };
+      delete updatedItemsById[action.payload._id];
+      return {
+        ...state,
+        itemsById: updatedItemsById,
+        allItems: state.allItems.filter(id => id !== action.payload._id),
+      };
+    case UPDATE_ITEM_QUANTITY:
+      const { _id, quantity } = action.payload;
+      return {
+        ...state,
+        itemsById: {
+          ...state.itemsById,
+          [_id]: {
+            ...state.itemsById[_id],
+            quantity: state.itemsById[_id].quantity + quantity,
+          },
+        },
+      };
+    default:
+      return state;
+  }
+};
+
+const CartContext = React.createContext();
+
+const CartProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(cartReducer, initialState);
+
+  const addToCart = (product) => {
+    dispatch({ type: ADD_ITEM, payload: product });
+  };
+
+  const removeFromCart = (product) => {
+    dispatch({ type: REMOVE_ITEM, payload: product });
+  };
+
+  const updateItemQuantity = (product, quantity) => {
+    dispatch({ type: UPDATE_ITEM_QUANTITY, payload: { _id: product._id, quantity } });
+  };
+
+  const getCartTotal = () => {
+    return Object.values(state.itemsById).reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
+  };
+
+  const getCartItems = () => {
+    return state.allItems.map(id => state.itemsById[id]) ?? [];
+  };
+
+  return (
+    <CartContext.Provider
+      value={{
+        cartItems: getCartItems(),
+        addToCart,
+        removeFromCart,
+        updateItemQuantity,
+        getCartTotal,
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
+};
+
+export { CartProvider, CartContext };
