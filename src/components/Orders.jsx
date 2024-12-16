@@ -57,7 +57,7 @@ const Orders = () => {
    */
   const fetchOrders = async () => {
     try {
-      const response = await fetch('https://redesigned-waddle-694p7764v49ph5px9-3080.app.github.dev/orders');
+      const response = await fetch('https://plankton-app-9p6gs.ondigitalocean.app/orders');
       if (!response.ok) {
         throw new Error('Failed to fetch orders');
       }
