@@ -38,7 +38,7 @@ export default function SingleView({data}) {
       </div>
       <div className="pa3 flex justify-end">
         <span className="ma2 f4">${product.price}</span>
-        {/* TODO Implement the AddToCart button */} /*
+        {/* TODO Implement the AddToCart button */ /*
       </div>
     </article>
 

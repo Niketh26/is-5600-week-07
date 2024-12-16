@@ -1,3 +1,4 @@
+/*
 import React, { useContext } from 'react';
 import PurchaseForm from './PurchaseForm';
 
@@ -57,6 +58,85 @@ const Cart = () => {
           Total: ${getCartTotal().toFixed(2)}
         </div>
       </div>
+      <div className="flex justify-end pa3 mb3">
+        <PurchaseForm />
+      </div>
+    </div>
+  );
+};
+
+export default Cart;
+*/
+
+import React, { useContext } from 'react';
+import { CartContext } from '../state/CartProvider'; // Import the CartContext
+import PurchaseForm from './PurchaseForm';
+
+const Cart = () => {
+  // Access cart-related functions and items from CartContext
+  const { cartItems, removeFromCart, updateItemQuantity, getCartTotal } = useContext(CartContext);
+
+  return (
+    <div className="center mw7 mv4">
+      <div className="bg-white pa3 mb3">
+        <h2 className="f2 mb2">Cart</h2>
+        {/* Table displaying the cart items */}
+        <table className="w-100 ba pa2">
+          <thead>
+            <tr>
+              <th className="tl pv2">Product</th>
+              <th className="tr pv2">Quantity</th>
+              <th className="tr pv2">Price</th>
+              <th className="tr pv2">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cartItems && cartItems.length > 0 ? (
+              cartItems.map((item) => (
+                <tr key={item._id}>
+                  <td className="tl pv2">{item.description}</td>
+                  <td className="tr pv2">
+                    {/* Decrease quantity */}
+                    <a
+                      className="pointer ba b--black-10 pv1 ph2 mr2"
+                      onClick={() => updateItemQuantity(item, -1)}
+                    >
+                      -
+                    </a>
+                    {item.quantity}
+                    {/* Increase quantity */}
+                    <a
+                      className="pointer ba b--black-10 pv1 ph2 ml2"
+                      onClick={() => updateItemQuantity(item, 1)}
+                    >
+                      +
+                    </a>
+                  </td>
+                  <td className="tr pv2">${item.price * item.quantity}</td>
+                  <td className="tr pv2">
+                    <a
+                      className="pointer ba b--black-10 pv1 ph2"
+                      onClick={() => removeFromCart(item)}
+                    >
+                      Remove
+                    </a>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="tl pv2">Your cart is empty</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+        <div className="tr f4 mv3">
+          {/* Display the total amount */}
+          Total: ${getCartTotal()?.toFixed(2)}
+        </div>
+      </div>
+
+      {/* Purchase Form Component */}
       <div className="flex justify-end pa3 mb3">
         <PurchaseForm />
       </div>
